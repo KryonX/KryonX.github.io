@@ -37,6 +37,7 @@
   #ai-go:hover { background: #1d4a78; }
   #ai-go:disabled { opacity: 0.5; cursor: not-allowed; }
   #ai-result { margin-top: 10px; font-size: 12px; color: #888; background: #111; border-radius: 6px; padding: 10px; display: none; line-height: 1.6; border: 1px solid #222; }
+  #ai-result.err { color: #f07070; border-color: #3a2020; }
   #statusbar { padding: 5px 14px; font-size: 11px; color: #444; background: #111; border-top: 1px solid #1e1e1e; }
   #file-input { display: none; }
 </style>
@@ -228,6 +229,7 @@
 
     btn.disabled = true;
     btn.textContent = 'Thinking…';
+    resultEl.className = 'ai-result';
     resultEl.style.display = 'block';
     resultEl.textContent = '…';
 
@@ -238,28 +240,29 @@
         body: JSON.stringify({ prompt })
       });
 
-      if (!res.ok) throw new Error('Worker error ' + res.status);
+      const parsed = await res.json();
 
-      const data = await res.json();
-      const text = data.content?.find(b => b.type === 'text')?.text || '';
-      const clean = text.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(clean);
+      if (!res.ok || parsed.error) {
+        throw new Error(parsed.error || 'Worker error ' + res.status);
+      }
 
       ['brightness','contrast','saturation','blur','hue','opacity'].forEach(k => {
-        if (parsed[k] !== undefined) setSlider(k, parsed[k]);
+        if (parsed[k] !== undefined) setSlider(k, Number(parsed[k]));
       });
       ['grayscale','sepia','invert'].forEach(f => {
         if (parsed[f] !== undefined) {
-          filt[f] = parsed[f];
-          document.getElementById('btn-' + f).classList.toggle('active', parsed[f]);
+          filt[f] = !!parsed[f];
+          document.getElementById('btn-' + f).classList.toggle('active', !!parsed[f]);
         }
       });
       applyFilters();
       resultEl.textContent = '✓ ' + (parsed.note || 'Applied!');
+      resultEl.classList.remove('err');
       setStatus('AI edits applied');
 
     } catch (err) {
       resultEl.textContent = '✗ ' + err.message;
+      resultEl.classList.add('err');
     }
 
     btn.disabled = false;
