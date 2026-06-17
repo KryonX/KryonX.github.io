@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JavaScript — Learn Anything</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0e0e10;--surface:#18181b;--border:#27272a;--text:#fafafa;--muted:#71717a;--accent:#facc15;--code-bg:#111113; }
+    html,body { background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.7; }
+    body::before { content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:0.2;pointer-events:none;z-index:0; }
+    .container { position:relative;z-index:1;max-width:740px;margin:0 auto;padding:3rem 1.5rem 6rem; }
+    .back-link { display:inline-flex;align-items:center;gap:.4rem;color:var(--muted);text-decoration:none;font-size:.85rem;margin-bottom:2.5rem;transition:color .15s; }
+    .back-link:hover { color:var(--accent); }
+    .topic-badge { display:inline-block;padding:.3rem .75rem;background:rgba(250,204,21,0.1);border:1px solid rgba(250,204,21,0.3);border-radius:6px;color:var(--accent);font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem; }
+    h1 { font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;letter-spacing:-.03em;margin-bottom:.5rem; }
+    .subtitle { color:var(--muted);font-size:1rem;font-weight:300;margin-bottom:2.5rem; }
+    .divider { border:none;border-top:1px solid var(--border);margin:2rem 0; }
+    h2 { font-size:1.15rem;font-weight:600;margin-bottom:.75rem;margin-top:2rem; }
+    p { color:#d4d4d8;margin-bottom:1rem; }
+    code { font-family:'JetBrains Mono',monospace;font-size:.85em;background:var(--code-bg);border:1px solid var(--border);padding:.15em .4em;border-radius:4px;color:#fde68a; }
+    pre { background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;overflow-x:auto;margin:1rem 0 1.5rem;font-family:'JetBrains Mono',monospace;font-size:.875rem;line-height:1.6; }
+    pre .kw { color:#facc15; } pre .str { color:#86efac; } pre .fn { color:#60a5fa; } pre .cm { color:#52525b; } pre .var { color:#fde68a; }
+    .resources { margin-top:2rem;display:flex;flex-direction:column;gap:.6rem; }
+    .resource-link { display:flex;align-items:center;gap:.6rem;padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);text-decoration:none;font-size:.9rem;transition:border-color .15s,background .15s; }
+    .resource-link:hover { border-color:var(--accent);background:rgba(250,204,21,0.05); }
+    .resource-link .icon { font-size:1.1rem; } .resource-link .meta { font-size:.75rem;color:var(--muted);margin-top:.1rem; } .resource-link .info { display:flex;flex-direction:column; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a class="back-link" href="../index.html">← Back to topics</a>
+  <div class="topic-badge">Language</div>
+  <h1>JavaScript</h1>
+  <p class="subtitle">De taal van het web — van DOM-manipulatie tot fetch requests.</p>
+  <hr class="divider"/>
+
+  <h2>Variabelen</h2>
+  <p>Gebruik <code>const</code> voor vaste waarden en <code>let</code> als de waarde verandert. Vermijd <code>var</code>.</p>
+  <pre>
+<span class="kw">const</span> <span class="var">naam</span> = <span class="str">"Bart"</span>;
+<span class="kw">let</span> <span class="var">score</span> = <span class="kw">0</span>;
+<span class="var">score</span>++;
+  </pre>
+
+  <h2>Functies & Arrow functions</h2>
+  <pre>
+<span class="cm">// Klassiek</span>
+<span class="kw">function</span> <span class="fn">begroet</span>(<span class="var">naam</span>) {
+  <span class="kw">return</span> <span class="str">`Hallo, ${<span class="var">naam</span>}!`</span>;
+}
+
+<span class="cm">// Arrow function</span>
+<span class="kw">const</span> <span class="fn">begroet</span> = (<span class="var">naam</span>) => <span class="str">`Hallo, ${<span class="var">naam</span>}!`</span>;
+  </pre>
+
+  <h2>DOM manipulatie</h2>
+  <pre>
+<span class="cm">// Element selecteren en aanpassen</span>
+<span class="kw">const</span> <span class="var">btn</span> = <span class="fn">document</span>.<span class="fn">getElementById</span>(<span class="str">"mijnKnop"</span>);
+<span class="var">btn</span>.<span class="fn">addEventListener</span>(<span class="str">"click"</span>, () => {
+  <span class="var">btn</span>.textContent = <span class="str">"Geklikt!"</span>;
+  <span class="var">btn</span>.style.background = <span class="str">"#a78bfa"</span>;
+});
+  </pre>
+
+  <h2>Fetch API</h2>
+  <pre>
+<span class="kw">async function</span> <span class="fn">getData</span>() {
+  <span class="kw">const</span> <span class="var">res</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://api.example.com/data"</span>);
+  <span class="kw">const</span> <span class="var">data</span> = <span class="kw">await</span> <span class="var">res</span>.<span class="fn">json</span>();
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="var">data</span>);
+}
+  </pre>
+
+  <hr class="divider"/>
+  <h2>Handige resources</h2>
+  <div class="resources">
+    <a class="resource-link" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noopener">
+      <span class="icon">📖</span>
+      <span class="info"><span>MDN Web Docs — JavaScript</span><span class="meta">Meest complete referentie</span></span>
+    </a>
+    <a class="resource-link" href="https://javascript.info/" target="_blank" rel="noopener">
+      <span class="icon">🚀</span>
+      <span class="info"><span>javascript.info</span><span class="meta">Diepgaand en gratis</span></span>
+    </a>
+  </div>
+</div>
+</body>
+</html>
