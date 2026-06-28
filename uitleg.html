@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Persistente Data & CRUD – Leerguide</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f0f1a;
+            color: #e0e0f0;
+            line-height: 1.7;
+        }
+        header {
+            background: linear-gradient(135deg, #1a1a3e, #2d1b69);
+            padding: 40px;
+            text-align: center;
+            border-bottom: 3px solid #7c3aed;
+        }
+        header h1 { font-size: 2.2rem; color: #c4b5fd; }
+        header p  { color: #a78bfa; margin-top: 8px; }
+
+        nav {
+            background: #1a1a2e;
+            padding: 16px 40px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #2d2d4e;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        nav a {
+            color: #a78bfa;
+            text-decoration: none;
+            background: #2d1b69;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        nav a:hover { background: #7c3aed; color: white; }
+
+        main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+
+        section { margin-bottom: 60px; }
+        h2 {
+            font-size: 1.6rem;
+            color: #c4b5fd;
+            border-left: 4px solid #7c3aed;
+            padding-left: 14px;
+            margin-bottom: 20px;
+        }
+        h3 { color: #a78bfa; margin: 24px 0 10px; font-size: 1.1rem; }
+
+        p, li { color: #c0c0d8; margin-bottom: 10px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 6px; }
+
+        .card {
+            background: #1a1a2e;
+            border: 1px solid #2d2d4e;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .card.green  { border-left: 4px solid #22c55e; }
+        .card.purple { border-left: 4px solid #7c3aed; }
+        .card.red    { border-left: 4px solid #ef4444; }
+        .card.blue   { border-left: 4px solid #3b82f6; }
+        .card.yellow { border-left: 4px solid #eab308; }
+
+        pre {
+            background: #0d0d1a;
+            border: 1px solid #2d2d4e;
+            border-radius: 8px;
+            padding: 16px 20px;
+            overflow-x: auto;
+            margin: 12px 0;
+            font-size: 0.88rem;
+        }
+        code { font-family: 'Consolas', 'Courier New', monospace; color: #c4b5fd; }
+        pre code { color: #e0e0f0; }
+
+        .highlight { color: #22c55e; font-weight: bold; }
+        .danger    { color: #ef4444; font-weight: bold; }
+        .info      { color: #60a5fa; }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            margin-right: 6px;
+        }
+        .badge-green  { background: #166534; color: #86efac; }
+        .badge-red    { background: #7f1d1d; color: #fca5a5; }
+        .badge-blue   { background: #1e3a5f; color: #93c5fd; }
+        .badge-purple { background: #3b0764; color: #d8b4fe; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+        th {
+            background: #2d1b69;
+            color: #c4b5fd;
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        td {
+            padding: 9px 14px;
+            border-bottom: 1px solid #2d2d4e;
+            color: #c0c0d8;
+            font-size: 0.9rem;
+        }
+        tr:hover td { background: #1f1f38; }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #2d2d4e;
+            margin: 30px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #6b6b8e;
+            font-size: 0.85rem;
+            border-top: 1px solid #2d2d4e;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🚀 PHP Persistente Data & CRUD</h1>
+    <p>Volledige leerguide voor P04 – Cookies, PDO, Prepared Statements & CRUD</p>
+</header>
+
+<nav>
+    <a href="#cookies">🍪 Cookies</a>
+    <a href="#pdo">🔌 PDO Verbinding</a>
+    <a href="#read">📋 Data lezen</a>
+    <a href="#prepared">🛡️ Prepared Statements</a>
+    <a href="#crud">⚙️ CRUD</a>
+    <a href="#master-detail">🔗 Master-Detail</a>
+    <a href="#xss">🔒 XSS & Veiligheid</a>
+    <a href="#cheatsheet">📌 Snelreferentie</a>
+</nav>
+
+<main>
+
+    <!-- ─── COOKIES ─────────────────────────────────────────────────────── -->
+    <section id="cookies">
+        <h2>🍪 Opdracht 1 – Cookies</h2>
+
+        <div class="card purple">
+            <h3>Wat is een cookie?</h3>
+            <p>Een cookie is een stukje data dat opgeslagen wordt <strong>in de browser</strong> van de gebruiker. PHP kan cookies lezen en instellen. Ze blijven bewaard ook als de gebruiker de pagina herlaadt of de browser sluit.</p>
+        </div>
+
+        <h3>Cookie instellen</h3>
+        <pre><code>setcookie('naam_van_cookie', 'waarde', time() + 3600);
+//                                              ^^^^ vervaltijd = 1 uur in seconden</code></pre>
+
+        <h3>Cookie uitlezen</h3>
+        <pre><code>if (isset($_COOKIE['naam_van_cookie'])) {
+    $waarde = $_COOKIE['naam_van_cookie'];
+    echo "Cookie gevonden: $waarde";
+}</code></pre>
+
+        <h3>Cookie direct beschikbaar maken na instellen</h3>
+        <pre><code>setcookie('gebruiker', 'Ahmed', time() + 3600);
+$_COOKIE['gebruiker'] = 'Ahmed'; // Nodig zodat cookie direct beschikbaar is op dezelfde pagina</code></pre>
+
+        <div class="card yellow">
+            <h3>⚠️ Let op: volgorde</h3>
+            <p><code>setcookie()</code> moet <strong>vóór alle HTML-output</strong> worden aangeroepen. Dus ook vóór <code>&lt;!DOCTYPE html&gt;</code> of echo-statements.</p>
+        </div>
+
+        <table>
+            <tr><th>Functie</th><th>Wat doet het</th></tr>
+            <tr><td><code>setcookie('naam', 'waarde', vervaltijd)</code></td><td>Stelt een cookie in</td></tr>
+            <tr><td><code>$_COOKIE['naam']</code></td><td>Leest de cookiewaarde</td></tr>
+            <tr><td><code>isset($_COOKIE['naam'])</code></td><td>Controleert of de cookie bestaat</td></tr>
+            <tr><td><code>time() + 3600</code></td><td>Vervaltijd: nu + 1 uur</td></tr>
+        </table>
+    </section>
+
+    <!-- ─── PDO ─────────────────────────────────────────────────────────── -->
+    <section id="pdo">
+        <h2>🔌 Opdracht 2 – PDO Databaseverbinding</h2>
+
+        <div class="card purple">
+            <h3>Wat is PDO?</h3>
+            <p><strong>PDO (PHP Data Objects)</strong> is de standaard manier in PHP om met een database te praten. Het werkt met meerdere databases (MySQL, PostgreSQL, etc.) en ondersteunt prepared statements voor veiligheid.</p>
+        </div>
+
+        <h3>Verbinding opzetten</h3>
+        <pre><code>$pdo = new PDO("mysql:host=localhost;dbname=webshop_p04;charset=utf8", "root", "");
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);</code></pre>
+
+        <h3>Altijd in een try-catch!</h3>
+        <pre><code>try {
+    $pdo = new PDO("mysql:host=localhost;dbname=webshop_p04;charset=utf8", "root", "");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "Verbinding gelukt!";
+} catch (PDOException $e) {
+    echo "Fout: " . $e->getMessage(); // Toont de foutmelding als verbinding mislukt
+}</code></pre>
+
+        <table>
+            <tr><th>Onderdeel</th><th>Uitleg</th></tr>
+            <tr><td><code>mysql:host=localhost</code></td><td>Het adres van de databaseserver</td></tr>
+            <tr><td><code>dbname=webshop_p04</code></td><td>De naam van de database</td></tr>
+            <tr><td><code>charset=utf8</code></td><td>Tekencoding (altijd meegeven!)</td></tr>
+            <tr><td><code>ERRMODE_EXCEPTION</code></td><td>Gooit een fout als iets misgaat</td></tr>
+            <tr><td><code>PDOException</code></td><td>Het type fout dat PDO gooit</td></tr>
+        </table>
+    </section>
+
+    <!-- ─── READ ────────────────────────────────────────────────────────── -->
+    <section id="read">
+        <h2>📋 Opdracht 3 – Producten uitlezen (READ)</h2>
+
+        <h3>Alle rijen ophalen</h3>
+        <pre><code>$stmt = $pdo->query("SELECT * FROM producten");
+$producten = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// fetchAll() geeft een array van alle rijen terug als associatieve arrays</code></pre>
+
+        <h3>Weergeven in HTML-tabel</h3>
+        <pre><code>&lt;table border="1"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Naam&lt;/th&gt;&lt;th&gt;Prijs&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;?php foreach ($producten as $product): ?&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;?= htmlspecialchars($product['id']) ?&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;?= htmlspecialchars($product['naam']) ?&gt;&lt;/td&gt;
+            &lt;td&gt;€&lt;?= htmlspecialchars($product['prijs']) ?&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;?php endforeach; ?&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+
+        <div class="card blue">
+            <h3>ℹ️ FETCH_ASSOC</h3>
+            <p><code>PDO::FETCH_ASSOC</code> geeft de data terug als een array waar je de kolomnaam als sleutel gebruikt: <code>$product['naam']</code>. Zonder dit krijg je ook genummerde sleutels: <code>$product[1]</code>.</p>
+        </div>
+    </section>
+
+    <!-- ─── PREPARED STATEMENTS ─────────────────────────────────────────── -->
+    <section id="prepared">
+        <h2>🛡️ Opdracht 4 – Prepared Statements (INSERT)</h2>
+
+        <div class="card red">
+            <h3>🚨 Waarom prepared statements?</h3>
+            <p>Zonder prepared statements kan een gebruiker kwaadaardige SQL invoeren via een formulier. Dit heet <strong>SQL-injectie</strong>.</p>
+            <p><span class="danger">Gevaarlijk voorbeeld:</span> stel iemand vult in als naam: <code>'; DROP TABLE producten; --</code></p>
+            <p>Met prepared statements worden invoerwaarden <strong>nooit direct in de SQL-query gezet</strong> — ze worden apart verstuurd en de database behandelt ze altijd als data, nooit als SQL-code.</p>
+        </div>
+
+        <h3>INSERT met prepared statement</h3>
+        <pre><code>// Stap 1: bereid de query voor met :placeholders
+$stmt = $pdo->prepare("INSERT INTO producten (naam, prijs, voorraad) VALUES (:naam, :prijs, :voorraad)");
+
+// Stap 2: koppel waarden aan de placeholders (bindParam)
+$stmt->bindParam(':naam',     $naam);
+$stmt->bindParam(':prijs',    $prijs);
+$stmt->bindParam(':voorraad', $voorraad);
+
+// Stap 3: voer de query uit
+$stmt->execute();</code></pre>
+
+        <h3>Kortere variant met execute array</h3>
+        <pre><code>$stmt = $pdo->prepare("INSERT INTO producten (naam, prijs, voorraad) VALUES (:naam, :prijs, :voorraad)");
+$stmt->execute([
+    ':naam'     => $_POST['naam'],
+    ':prijs'    => $_POST['prijs'],
+    ':voorraad' => $_POST['voorraad']
+]);</code></pre>
+
+        <h3>Formulier verwerken</h3>
+        <pre><code>if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Formulier is verstuurd, verwerk de data
+    $naam = $_POST['naam'];
+    // ... rest van de code
+}</code></pre>
+
+        <table>
+            <tr><th>Methode</th><th>Wanneer gebruiken</th></tr>
+            <tr><td><code>bindParam()</code></td><td>Koppelt een PHP-variabele aan een placeholder</td></tr>
+            <tr><td><code>execute([...])</code></td><td>Voert query uit, kan direct waarden meegeven</td></tr>
+            <tr><td><code>$_SERVER['REQUEST_METHOD']</code></td><td>Controleren of formulier via POST verstuurd is</td></tr>
+        </table>
+    </section>
+
+    <!-- ─── CRUD ────────────────────────────────────────────────────────── -->
+    <section id="crud">
+        <h2>⚙️ Opdracht 5 – Volledige CRUD</h2>
+
+        <div class="card purple">
+            <h3>CRUD = 4 basisoperaties</h3>
+            <table>
+                <tr><th>Letter</th><th>Betekenis</th><th>SQL</th><th>HTTP</th></tr>
+                <tr><td><span class="highlight">C</span></td><td>Create – aanmaken</td><td><code>INSERT</code></td><td>POST</td></tr>
+                <tr><td><span class="info">R</span></td><td>Read – lezen</td><td><code>SELECT</code></td><td>GET</td></tr>
+                <tr><td><span class="badge badge-blue">U</span></td><td>Update – wijzigen</td><td><code>UPDATE</code></td><td>POST</td></tr>
+                <tr><td><span class="danger">D</span></td><td>Delete – verwijderen</td><td><code>DELETE</code></td><td>GET (via link)</td></tr>
+            </table>
+        </div>
+
+        <h3>SELECT – alle producten ophalen</h3>
+        <pre><code>$producten = $pdo->query("SELECT * FROM producten")->fetchAll(PDO::FETCH_ASSOC);</code></pre>
+
+        <h3>INSERT – nieuw product toevoegen</h3>
+        <pre><code>$stmt = $pdo->prepare("INSERT INTO producten (naam, prijs, voorraad) VALUES (:naam, :prijs, :voorraad)");
+$stmt->execute([':naam' => $naam, ':prijs' => $prijs, ':voorraad' => $voorraad]);</code></pre>
+
+        <h3>UPDATE – product wijzigen</h3>
+        <pre><code>$stmt = $pdo->prepare("UPDATE producten SET naam=:naam, prijs=:prijs, voorraad=:voorraad WHERE id=:id");
+$stmt->execute([':naam' => $naam, ':prijs' => $prijs, ':voorraad' => $voorraad, ':id' => $id]);
+// ⚠️ Altijd WHERE id=:id meegeven anders worden ALLE rijen gewijzigd!</code></pre>
+
+        <h3>DELETE – product verwijderen</h3>
+        <pre><code>$stmt = $pdo->prepare("DELETE FROM producten WHERE id = :id");
+$stmt->execute([':id' => $_GET['verwijder']]);
+// ⚠️ Altijd WHERE meegeven anders worden ALLE rijen verwijderd!</code></pre>
+
+        <h3>Actie detecteren via $_POST of $_GET</h3>
+        <pre><code>// Via hidden input in formulier
+&lt;input type="hidden" name="actie" value="toevoegen"&gt;
+
+// In PHP controleer je dan:
+if (isset($_POST['actie']) && $_POST['actie'] === 'toevoegen') {
+    // voer INSERT uit
+}
+
+// Verwijderen via link:
+&lt;a href="?verwijder=5"&gt;Verwijderen&lt;/a&gt;
+// In PHP:
+if (isset($_GET['verwijder'])) { ... }</code></pre>
+
+        <h3>Wijzigknop: id meesturen via GET</h3>
+        <pre><code>&lt;a href="?wijzig=&lt;?= $product['id'] ?&gt;"&gt;Wijzigen&lt;/a&gt;
+
+// In PHP haal je dan één product op:
+if (isset($_GET['wijzig'])) {
+    $stmt = $pdo->prepare("SELECT * FROM producten WHERE id = :id");
+    $stmt->execute([':id' => $_GET['wijzig']]);
+    $wijzig = $stmt->fetch(PDO::FETCH_ASSOC);
+}</code></pre>
+    </section>
+
+    <!-- ─── MASTER-DETAIL ────────────────────────────────────────────────── -->
+    <section id="master-detail">
+        <h2>🔗 Opdracht 6 – Master-Detail Patroon</h2>
+
+        <div class="card blue">
+            <h3>Wat is master-detail?</h3>
+            <p>Een <strong>overzichtspagina (master)</strong> toont alle items. Als je op een item klikt ga je naar een <strong>detailpagina</strong> die één item uitgebreid toont. Het id van het item wordt via de URL meegegeven.</p>
+        </div>
+
+        <h3>producten.php – overzicht (master)</h3>
+        <pre><code>&lt;?php
+$producten = $pdo->query("SELECT * FROM producten")->fetchAll(PDO::FETCH_ASSOC);
+?&gt;
+&lt;?php foreach ($producten as $p): ?&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;?= htmlspecialchars($p['naam']) ?&gt;&lt;/td&gt;
+        &lt;!-- Stuur id mee in de URL --&gt;
+        &lt;td&gt;&lt;a href="product_detail.php?id=&lt;?= $p['id'] ?&gt;"&gt;Bekijk details&lt;/a&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;?php endforeach; ?&gt;</code></pre>
+
+        <h3>product_detail.php – detailpagina</h3>
+        <pre><code>&lt;?php
+// Haal id op uit de URL
+$id = $_GET['id'];
+
+// Gebruik prepared statement! (id komt uit de URL = gebruikersinvoer = gevaarlijk)
+$stmt = $pdo->prepare("SELECT * FROM producten WHERE id = :id");
+$stmt->execute([':id' => $id]);
+$product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$product) {
+    die("Product niet gevonden.");
+}
+?&gt;</code></pre>
+
+        <div class="card red">
+            <h3>🚨 Waarom prepared statement op de detailpagina?</h3>
+            <p>Het <code>id</code> in de URL (<code>?id=1</code>) kan door een gebruiker aangepast worden naar kwaadaardige SQL. Gebruik daarom altijd een prepared statement, ook als het maar één waarde is!</p>
+        </div>
+    </section>
+
+    <!-- ─── XSS ─────────────────────────────────────────────────────────── -->
+    <section id="xss">
+        <h2>🔒 Veiligheid – XSS & SQL-injectie</h2>
+
+        <div class="card red">
+            <h3>XSS – Cross-Site Scripting</h3>
+            <p>Als je gebruikersinvoer direct echo'd, kan iemand JavaScript-code in je pagina injecteren:</p>
+            <pre><code>// GEVAARLIJK:
+echo $_POST['naam']; // Stel iemand vult in: &lt;script&gt;alert('gehackt!')&lt;/script&gt;
+
+// VEILIG:
+echo htmlspecialchars($_POST['naam']); // Zet &lt; en &gt; om naar &amp;lt; en &amp;gt;</code></pre>
+            <p><strong>Regel: gebruik altijd <code>htmlspecialchars()</code> als je data uit de database of formulier weergeeft in HTML.</strong></p>
+        </div>
+
+        <div class="card red">
+            <h3>SQL-injectie</h3>
+            <p>Als je waarden direct in je SQL-query plakt:</p>
+            <pre><code>// GEVAARLIJK:
+$naam = $_POST['naam'];
+$pdo->query("SELECT * FROM producten WHERE naam = '$naam'");
+// Iemand vult in: ' OR '1'='1  → alle rijen worden teruggegeven!
+
+// VEILIG: prepared statement
+$stmt = $pdo->prepare("SELECT * FROM producten WHERE naam = :naam");
+$stmt->execute([':naam' => $naam]);</code></pre>
+        </div>
+
+        <table>
+            <tr><th>Aanval</th><th>Wat het doet</th><th>Oplossing</th></tr>
+            <tr><td>XSS</td><td>JavaScript in HTML injecteren</td><td><code>htmlspecialchars()</code></td></tr>
+            <tr><td>SQL-injectie</td><td>Kwaadaardige SQL via invoer</td><td>Prepared statements</td></tr>
+        </table>
+    </section>
+
+    <!-- ─── CHEATSHEET ───────────────────────────────────────────────────── -->
+    <section id="cheatsheet">
+        <h2>📌 Snelreferentie – Alles op één plek</h2>
+
+        <h3>Databaseverbinding (kopieer dit altijd)</h3>
+        <pre><code>try {
+    $pdo = new PDO("mysql:host=localhost;dbname=JOUW_DB;charset=utf8", "root", "");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Verbinding mislukt: " . $e->getMessage());
+}</code></pre>
+
+        <h3>Alle CRUD queries</h3>
+        <pre><code>// SELECT (alle rijen)
+$rijen = $pdo->query("SELECT * FROM tabel")->fetchAll(PDO::FETCH_ASSOC);
+
+// SELECT (één rij op id)
+$stmt = $pdo->prepare("SELECT * FROM tabel WHERE id = :id");
+$stmt->execute([':id' => $id]);
+$rij = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// INSERT
+$stmt = $pdo->prepare("INSERT INTO tabel (kolom1, kolom2) VALUES (:v1, :v2)");
+$stmt->execute([':v1' => $v1, ':v2' => $v2]);
+
+// UPDATE
+$stmt = $pdo->prepare("UPDATE tabel SET kolom1=:v1, kolom2=:v2 WHERE id=:id");
+$stmt->execute([':v1' => $v1, ':v2' => $v2, ':id' => $id]);
+
+// DELETE
+$stmt = $pdo->prepare("DELETE FROM tabel WHERE id = :id");
+$stmt->execute([':id' => $id]);</code></pre>
+
+        <h3>Cookies</h3>
+        <pre><code>setcookie('sleutel', 'waarde', time() + 3600); // Instellen (1 uur geldig)
+$_COOKIE['sleutel'] = 'waarde';               // Direct beschikbaar maken
+$waarde = $_COOKIE['sleutel'];                 // Uitlezen
+isset($_COOKIE['sleutel'])                     // Bestaan controleren</code></pre>
+
+        <h3>Veilig weergeven</h3>
+        <pre><code>echo htmlspecialchars($variabele); // Altijd gebruiken bij output van user/db data</code></pre>
+
+        <h3>Formulier verwerken</h3>
+        <pre><code>if ($_SERVER['REQUEST_METHOD'] === 'POST') { /* formulier verstuurd */ }
+if (isset($_POST['veld']))  { $waarde = $_POST['veld'];  }
+if (isset($_GET['param']))  { $waarde = $_GET['param'];  }</code></pre>
+
+        <h3>Databasetabel aanmaken (SQL)</h3>
+        <pre><code>CREATE TABLE producten (
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    naam     VARCHAR(100)    NOT NULL,
+    prijs    DECIMAL(10,2)   NOT NULL,
+    voorraad INT             NOT NULL
+);</code></pre>
+
+        <hr class="divider">
+
+        <div class="card green">
+            <h3>✅ Checklist voor elke opdracht</h3>
+            <ul>
+                <li>Databaseverbinding in try-catch?</li>
+                <li>Gebruikersinvoer via prepared statements?</li>
+                <li>Output via <code>htmlspecialchars()</code>?</li>
+                <li>Formulier controle via <code>$_SERVER['REQUEST_METHOD']</code>?</li>
+                <li>Cookie vóór HTML-output gezet?</li>
+                <li>WHERE-clausule bij UPDATE en DELETE?</li>
+            </ul>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <p>PHP Persistente Data & CRUD – P04 Leerguide &nbsp;|&nbsp; MBO4 Software Development</p>
+</footer>
+
+</body>
+</html>
